@@ -1,0 +1,30 @@
+# Core scraping dependencies
+requests==2.31.0
+beautifulsoup4==4.12.2
+lxml==4.9.3
+
+# Image processing
+Pillow==10.1.0
+
+# AWS SDK
+boto3==1.29.7
+botocore==1.32.7
+
+# Additional utilities
+python-dateutil==2.8.2
+
+# Development and testing dependencies (for local development)
+pytest==7.4.3
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+black==23.11.0
+flake8==6.1.0
+mypy==1.7.1
+types-requests==2.31.0.10
+types-boto3==1.0.2
+
+# Optional: Enhanced scraping capabilities
+# Uncomment if you need these features:
+# scrapy==2.11.0  # For more complex scraping scenarios
+# selenium==4.15.2  # For JavaScript-heavy sites
+# playwright==1.40.0  # Alternative to Selenium
