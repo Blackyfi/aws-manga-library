@@ -128,6 +128,7 @@ EOF
         {
             "ID": "DeleteOldVersions",
             "Status": "Enabled",
+            "Filter": {},
             "NoncurrentVersionExpiration": {
                 "NoncurrentDays": 30
             }
@@ -135,6 +136,7 @@ EOF
         {
             "ID": "TransitionToIA",
             "Status": "Enabled",
+            "Filter": {},
             "Transitions": [
                 {
                     "Days": 90,
@@ -182,6 +184,7 @@ else
         {
             "ID": "DeleteOldBackups",
             "Status": "Enabled",
+            "Filter": {},
             "Expiration": {
                 "Days": 90
             }
@@ -189,6 +192,7 @@ else
         {
             "ID": "TransitionToGlacier",
             "Status": "Enabled",
+            "Filter": {},
             "Transitions": [
                 {
                     "Days": 30,
