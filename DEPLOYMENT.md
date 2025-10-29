@@ -505,6 +505,7 @@ First, do a simple health check:
 aws lambda invoke \
   --function-name manga-scraper-dev \
   --region eu-west-3 \
+  --cli-binary-format raw-in-base64-out \
   --payload '{"action":"health_check"}' \
   response.json
 
@@ -543,6 +544,7 @@ cat response.json
 aws lambda invoke \
   --function-name manga-scraper-dev \
   --region eu-west-3 \
+  --cli-binary-format raw-in-base64-out \
   --payload '{"action":"list_manga","source":"mangadex","limit":5}' \
   response.json
 
@@ -982,6 +984,7 @@ aws dynamodb scan --table-name manga-scraper-dev-metadata
 
 # Invoke Lambda function
 aws lambda invoke --function-name manga-scraper-dev \
+  --cli-binary-format raw-in-base64-out \
   --payload '{"action":"health_check"}' response.json
 
 # Update Lambda function
