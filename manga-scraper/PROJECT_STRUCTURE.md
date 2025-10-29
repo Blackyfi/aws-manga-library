@@ -3,7 +3,7 @@
 ## 📁 Complete Directory Tree
 
 ```
-manga-scraper/
+C:\Users\Nicolas\Documents\git\aws-manga-library/manga-scraper/
 ├── .github/
 │   └── workflows/
 │       ├── ci.yml                          # CI/CD pipeline configuration
