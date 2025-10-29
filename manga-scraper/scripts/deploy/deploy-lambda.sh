@@ -193,7 +193,6 @@ if [ "${FUNCTION_EXISTS}" = true ]; then
         --environment "Variables={
             S3_BUCKET=${S3_BUCKET},
             DYNAMODB_TABLE=${DYNAMODB_TABLE},
-            AWS_REGION=${REGION},
             REQUESTS_PER_SECOND=${REQUESTS_PER_SECOND:-0.5},
             MAX_RETRIES=${MAX_RETRIES:-3},
             RETRY_DELAY=${RETRY_DELAY:-5},
@@ -229,7 +228,6 @@ else
         --environment "Variables={
             S3_BUCKET=${S3_BUCKET},
             DYNAMODB_TABLE=${DYNAMODB_TABLE},
-            AWS_REGION=${REGION},
             REQUESTS_PER_SECOND=${REQUESTS_PER_SECOND:-0.5},
             MAX_RETRIES=${MAX_RETRIES:-3},
             RETRY_DELAY=${RETRY_DELAY:-5},
