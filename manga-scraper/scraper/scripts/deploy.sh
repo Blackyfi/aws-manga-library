@@ -50,31 +50,65 @@ fi
 # Create deployment package
 echo "Creating deployment package..."
 
-# Create temporary directory
-TEMP_DIR=$(mktemp -d)
-PACKAGE_DIR="${TEMP_DIR}/package"
-mkdir -p "${PACKAGE_DIR}"
+# Check if Docker is available
+if command -v docker &> /dev/null; then
+    echo "  Using Docker to build Lambda-compatible package..."
 
-echo "  Working directory: ${TEMP_DIR}"
+    # Create temporary directory
+    TEMP_DIR=$(mktemp -d)
+    PACKAGE_FILE="${TEMP_DIR}/lambda-package.zip"
 
-# Install dependencies
-echo "  Installing dependencies..."
-pip install -r lambda/requirements.txt -t "${PACKAGE_DIR}" --quiet
+    echo "  Working directory: ${TEMP_DIR}"
 
-# Copy source code
-echo "  Copying source code..."
-cp -r src "${PACKAGE_DIR}/"
-cp -r lambda/* "${PACKAGE_DIR}/"
+    # Build Docker image and extract package
+    echo "  Building Docker image..."
+    docker build -t manga-scraper-lambda:latest -f Dockerfile.lambda . > /dev/null 2>&1
 
-# Create zip file
-echo "  Creating zip archive..."
-cd "${PACKAGE_DIR}"
-zip -r9 ../lambda-package.zip . > /dev/null
-cd - > /dev/null
+    echo "  Extracting Lambda package..."
+    # Create a container and copy the /var/task directory
+    CONTAINER_ID=$(docker create manga-scraper-lambda:latest)
+    docker cp "${CONTAINER_ID}:/var/task" "${TEMP_DIR}/package"
+    docker rm "${CONTAINER_ID}" > /dev/null 2>&1
 
-PACKAGE_FILE="${TEMP_DIR}/lambda-package.zip"
-PACKAGE_SIZE=$(du -h "${PACKAGE_FILE}" | cut -f1)
-echo "  ✓ Package created: ${PACKAGE_SIZE}"
+    # Create zip file
+    echo "  Creating zip archive..."
+    cd "${TEMP_DIR}/package"
+    zip -r9 ../lambda-package.zip . > /dev/null
+    cd - > /dev/null
+
+    PACKAGE_SIZE=$(du -h "${PACKAGE_FILE}" | cut -f1)
+    echo "  ✓ Package created: ${PACKAGE_SIZE}"
+else
+    echo "  Warning: Docker not found, using pip install (may not work with Lambda)"
+    echo "  For best results, install Docker and re-run this script"
+    echo ""
+
+    # Create temporary directory
+    TEMP_DIR=$(mktemp -d)
+    PACKAGE_DIR="${TEMP_DIR}/package"
+    mkdir -p "${PACKAGE_DIR}"
+
+    echo "  Working directory: ${TEMP_DIR}"
+
+    # Install dependencies
+    echo "  Installing dependencies..."
+    pip install -r lambda/requirements.txt -t "${PACKAGE_DIR}" --quiet
+
+    # Copy source code
+    echo "  Copying source code..."
+    cp -r src "${PACKAGE_DIR}/"
+    cp -r lambda/* "${PACKAGE_DIR}/"
+
+    # Create zip file
+    echo "  Creating zip archive..."
+    cd "${PACKAGE_DIR}"
+    zip -r9 ../lambda-package.zip . > /dev/null
+    cd - > /dev/null
+
+    PACKAGE_FILE="${TEMP_DIR}/lambda-package.zip"
+    PACKAGE_SIZE=$(du -h "${PACKAGE_FILE}" | cut -f1)
+    echo "  ✓ Package created: ${PACKAGE_SIZE}"
+fi
 
 # Check if Lambda function exists
 echo ""

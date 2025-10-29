@@ -1,0 +1,15 @@
+# Dockerfile for building Lambda deployment package
+# Uses AWS Lambda Python 3.11 base image to ensure compatibility
+
+FROM public.ecr.aws/lambda/python:3.11
+
+# Install dependencies
+COPY lambda/requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt -t /var/task/
+
+# Copy application code
+COPY src /var/task/src/
+COPY lambda/* /var/task/
+
+# This image won't be run directly - we'll extract the /var/task directory
+CMD ["handler.lambda_handler"]
