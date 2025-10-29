@@ -126,14 +126,14 @@ EOF
 {
     "Rules": [
         {
-            "Id": "DeleteOldVersions",
+            "ID": "DeleteOldVersions",
             "Status": "Enabled",
             "NoncurrentVersionExpiration": {
                 "NoncurrentDays": 30
             }
         },
         {
-            "Id": "TransitionToIA",
+            "ID": "TransitionToIA",
             "Status": "Enabled",
             "Transitions": [
                 {
@@ -180,14 +180,14 @@ else
 {
     "Rules": [
         {
-            "Id": "DeleteOldBackups",
+            "ID": "DeleteOldBackups",
             "Status": "Enabled",
             "Expiration": {
                 "Days": 90
             }
         },
         {
-            "Id": "TransitionToGlacier",
+            "ID": "TransitionToGlacier",
             "Status": "Enabled",
             "Transitions": [
                 {
