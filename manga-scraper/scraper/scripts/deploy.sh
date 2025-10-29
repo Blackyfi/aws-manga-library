@@ -14,7 +14,7 @@ set -e  # Exit on error
 # Configuration
 ENVIRONMENT="${1:-dev}"
 FUNCTION_NAME="${2:-manga-scraper-${ENVIRONMENT}}"
-REGION="${AWS_REGION:-us-east-1}"
+REGION="${AWS_REGION:-eu-west-3}"
 
 echo "========================================="
 echo "Lambda Deployment for Manga Scraper"

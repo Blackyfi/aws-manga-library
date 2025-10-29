@@ -26,7 +26,7 @@ def example_1_simple_scrape():
     scraper = MangaScraper(
         s3_bucket='my-manga-bucket',
         dynamodb_table='manga-metadata',
-        region='us-east-1'
+        region='eu-west-3'
     )
     
     # Scrape a manga (limit to 1 chapter for testing)

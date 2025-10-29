@@ -46,7 +46,7 @@ Create a `.env` file:
 ```bash
 S3_BUCKET=your-manga-bucket
 DYNAMODB_TABLE=manga-metadata
-AWS_REGION=us-east-1
+AWS_REGION=eu-west-3
 REQUESTS_PER_SECOND=0.5
 BASE_DELAY_SECONDS=2.0
 MAX_RETRIES=3
@@ -65,7 +65,7 @@ from manga_scraper import MangaScraper
 scraper = MangaScraper(
     s3_bucket='my-manga-bucket',
     dynamodb_table='manga-metadata',
-    region='us-east-1'
+    region='eu-west-3'
 )
 
 # Scrape a complete manga

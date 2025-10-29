@@ -228,7 +228,7 @@ try:
         logger_name: str,
         log_group: str,
         log_stream: Optional[str] = None,
-        region: str = 'us-east-1',
+        region: str = 'eu-west-3',
         level: str = 'INFO'
     ) -> logging.Logger:
         """

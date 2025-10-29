@@ -221,7 +221,7 @@ class RetryHandler:
 class S3Storage:
     """Handles S3 storage operations"""
     
-    def __init__(self, bucket_name: str, region: str = 'us-east-1'):
+    def __init__(self, bucket_name: str, region: str = 'eu-west-3'):
         """
         Initialize S3 storage handler
         
@@ -287,8 +287,8 @@ class S3Storage:
 
 class DynamoDBManager:
     """Handles DynamoDB operations for metadata"""
-    
-    def __init__(self, table_name: str, region: str = 'us-east-1'):
+
+    def __init__(self, table_name: str, region: str = 'eu-west-3'):
         """
         Initialize DynamoDB manager
         
@@ -395,7 +395,7 @@ class MangaScraper:
         self,
         s3_bucket: str,
         dynamodb_table: str,
-        region: str = 'us-east-1',
+        region: str = 'eu-west-3',
         user_agent: str = 'MangaScraperBot/1.0'
     ):
         """
@@ -716,7 +716,7 @@ def lambda_handler(event, context):
         # Get configuration from environment variables
         s3_bucket = os.environ.get('S3_BUCKET')
         dynamodb_table = os.environ.get('DYNAMODB_TABLE')
-        region = os.environ.get('AWS_REGION', 'us-east-1')
+        region = os.environ.get('AWS_REGION', 'eu-west-3')
         
         if not s3_bucket or not dynamodb_table:
             raise ValueError("Missing required environment variables")
@@ -761,7 +761,7 @@ if __name__ == '__main__':
     scraper = MangaScraper(
         s3_bucket='my-manga-bucket',
         dynamodb_table='manga-metadata',
-        region='us-east-1'
+        region='eu-west-3'
     )
     
     # Test scraping

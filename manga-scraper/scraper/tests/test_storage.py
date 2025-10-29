@@ -19,11 +19,11 @@ class TestS3Storage:
     @patch('boto3.client')
     def test_initialize(self, mock_boto_client):
         """Test S3Storage initialization"""
-        storage = S3Storage('test-bucket', 'us-east-1')
+        storage = S3Storage('test-bucket', 'eu-west-3')
 
         assert storage.bucket_name == 'test-bucket'
-        assert storage.region == 'us-east-1'
-        mock_boto_client.assert_called_once_with('s3', region_name='us-east-1')
+        assert storage.region == 'eu-west-3'
+        mock_boto_client.assert_called_once_with('s3', region_name='eu-west-3')
 
     @patch('boto3.client')
     def test_upload_image_success(self, mock_boto_client):
@@ -132,11 +132,11 @@ class TestDynamoDBManager:
     @patch('boto3.resource')
     def test_initialize(self, mock_boto_resource):
         """Test DynamoDBManager initialization"""
-        manager = DynamoDBManager('test-table', 'us-east-1')
+        manager = DynamoDBManager('test-table', 'eu-west-3')
 
         assert manager.table_name == 'test-table'
-        assert manager.region == 'us-east-1'
-        mock_boto_resource.assert_called_once_with('dynamodb', region_name='us-east-1')
+        assert manager.region == 'eu-west-3'
+        mock_boto_resource.assert_called_once_with('dynamodb', region_name='eu-west-3')
 
     @patch('boto3.resource')
     def test_save_manga_success(self, mock_boto_resource):

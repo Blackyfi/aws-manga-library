@@ -21,7 +21,7 @@ set -e  # Exit on error
 # Configuration
 ENVIRONMENT="${1:-dev}"
 PROJECT_NAME="manga-scraper"
-REGION="${AWS_REGION:-us-east-1}"
+REGION="${AWS_REGION:-eu-west-3}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Resource names

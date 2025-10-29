@@ -20,7 +20,7 @@ set -e  # Exit on error
 # Configuration
 ENVIRONMENT="${1:-dev}"
 MODE="${2:-dry-run}"
-REGION="${AWS_REGION:-us-east-1}"
+REGION="${AWS_REGION:-eu-west-3}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 

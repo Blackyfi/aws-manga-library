@@ -281,12 +281,12 @@ It will ask for:
 ```
 AWS Access Key ID [None]: <paste your access key ID>
 AWS Secret Access Key [None]: <paste your secret access key>
-Default region name [None]: us-east-1
+Default region name [None]: eu-west-3
 Default output format [None]: json
 ```
 
 **Region options**:
-- `us-east-1` (Virginia - most services available)
+- `eu-west-3` (Virginia - most services available)
 - `us-west-2` (Oregon)
 - `eu-west-1` (Ireland)
 - `ap-southeast-1` (Singapore)
@@ -376,7 +376,7 @@ cat .env.dev
 
 You'll see something like:
 ```bash
-AWS_REGION=us-east-1
+AWS_REGION=eu-west-3
 AWS_ACCOUNT_ID=123456789012
 S3_BUCKET=manga-scraper-dev-images
 S3_BACKUP_BUCKET=manga-scraper-dev-backups
@@ -418,7 +418,7 @@ Now we'll set up the DynamoDB database with initial data.
 aws dynamodb scan \
   --table-name manga-scraper-dev-metadata \
   --select "COUNT" \
-  --region us-east-1
+  --region eu-west-3
 ```
 
 You should see about 14-15 items created.
@@ -480,7 +480,7 @@ cd ..
 
 ```bash
 # Check Lambda function exists
-aws lambda get-function --function-name manga-scraper-dev --region us-east-1
+aws lambda get-function --function-name manga-scraper-dev --region eu-west-3
 ```
 
 You'll see detailed information about your function including:
@@ -504,7 +504,7 @@ First, do a simple health check:
 ```bash
 aws lambda invoke \
   --function-name manga-scraper-dev \
-  --region us-east-1 \
+  --region eu-west-3 \
   --payload '{"action":"health_check"}' \
   response.json
 
@@ -542,7 +542,7 @@ cat response.json
 ```bash
 aws lambda invoke \
   --function-name manga-scraper-dev \
-  --region us-east-1 \
+  --region eu-west-3 \
   --payload '{"action":"list_manga","source":"mangadex","limit":5}' \
   response.json
 
@@ -555,7 +555,7 @@ cat response.json
 
 ```bash
 # View recent logs
-aws logs tail /aws/lambda/manga-scraper-dev --follow --region us-east-1
+aws logs tail /aws/lambda/manga-scraper-dev --follow --region eu-west-3
 ```
 
 **What you'll see:**
@@ -607,7 +607,7 @@ manga/one-piece/chapters/1/page_002.webp
 # Scan the table (get all items)
 aws dynamodb scan \
   --table-name manga-scraper-dev-metadata \
-  --region us-east-1 \
+  --region eu-west-3 \
   --max-items 10
 ```
 
@@ -686,7 +686,7 @@ Increase timeout:
 aws lambda update-function-configuration \
   --function-name manga-scraper-dev \
   --timeout 600 \
-  --region us-east-1
+  --region eu-west-3
 ```
 
 ---
@@ -896,7 +896,7 @@ If you want to delete everything (be careful!):
 
 ### Delete Lambda Function
 ```bash
-aws lambda delete-function --function-name manga-scraper-dev --region us-east-1
+aws lambda delete-function --function-name manga-scraper-dev --region eu-west-3
 ```
 
 ### Delete S3 Buckets
@@ -912,7 +912,7 @@ aws s3 rb s3://manga-scraper-dev-backups
 
 ### Delete DynamoDB Table
 ```bash
-aws dynamodb delete-table --table-name manga-scraper-dev-metadata --region us-east-1
+aws dynamodb delete-table --table-name manga-scraper-dev-metadata --region eu-west-3
 ```
 
 ### Delete IAM Role

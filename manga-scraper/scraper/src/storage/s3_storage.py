@@ -31,7 +31,7 @@ class S3Storage:
     def __init__(
         self,
         bucket_name: str,
-        region: str = 'us-east-1',
+        region: str = 'eu-west-3',
         cache_control: str = 'max-age=2592000'  # 30 days
     ):
         """

@@ -20,7 +20,7 @@ set -e  # Exit on error
 COMPONENT="${1:-lambda}"
 ENVIRONMENT="${2:-dev}"
 VERSION="${3:-}"
-REGION="${AWS_REGION:-us-east-1}"
+REGION="${AWS_REGION:-eu-west-3}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 

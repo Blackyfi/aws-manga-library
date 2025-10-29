@@ -22,7 +22,7 @@ set -e  # Exit on error
 ENVIRONMENT="${1:-dev}"
 REPORT_TYPE="${2:-usage}"
 PERIOD="${3:-daily}"
-REGION="${AWS_REGION:-us-east-1}"
+REGION="${AWS_REGION:-eu-west-3}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 

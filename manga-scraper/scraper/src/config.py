@@ -17,7 +17,7 @@ class ScraperConfig:
     # AWS Configuration
     s3_bucket: str
     dynamodb_table: str
-    aws_region: str = 'us-east-1'
+    aws_region: str = 'eu-west-3'
     
     # Rate Limiting
     requests_per_second: float = 0.5
@@ -58,7 +58,7 @@ class ScraperConfig:
         return cls(
             s3_bucket=os.environ.get('S3_BUCKET', ''),
             dynamodb_table=os.environ.get('DYNAMODB_TABLE', ''),
-            aws_region=os.environ.get('AWS_REGION', 'us-east-1'),
+            aws_region=os.environ.get('AWS_REGION', 'eu-west-3'),
             requests_per_second=float(os.environ.get('REQUESTS_PER_SECOND', '0.5')),
             base_delay_seconds=float(os.environ.get('BASE_DELAY_SECONDS', '2.0')),
             max_retries=int(os.environ.get('MAX_RETRIES', '3')),
@@ -100,7 +100,7 @@ class ScraperConfig:
 DEFAULT_CONFIG = ScraperConfig(
     s3_bucket='my-manga-bucket',
     dynamodb_table='manga-metadata',
-    aws_region='us-east-1',
+    aws_region='eu-west-3',
     requests_per_second=0.5,
     base_delay_seconds=2.0,
 )

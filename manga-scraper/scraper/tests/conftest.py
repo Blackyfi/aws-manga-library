@@ -31,7 +31,7 @@ def test_config() -> ScraperConfig:
     return ScraperConfig(
         s3_bucket='test-manga-bucket',
         dynamodb_table='test-manga-metadata',
-        aws_region='us-east-1',
+        aws_region='eu-west-3',
         requests_per_second=10.0,  # Faster for tests
         max_retries=2,  # Fewer retries for tests
         target_image_size_kb=100,
@@ -199,7 +199,7 @@ def reset_environment():
     # Set test environment variables
     os.environ['S3_BUCKET'] = 'test-bucket'
     os.environ['DYNAMODB_TABLE'] = 'test-table'
-    os.environ['AWS_REGION'] = 'us-east-1'
+    os.environ['AWS_REGION'] = 'eu-west-3'
     os.environ['LOG_LEVEL'] = 'DEBUG'
 
     yield

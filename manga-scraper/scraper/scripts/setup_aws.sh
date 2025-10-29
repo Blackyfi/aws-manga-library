@@ -17,7 +17,7 @@ set -e  # Exit on error
 # Configuration
 ENVIRONMENT="${1:-dev}"
 PROJECT_NAME="manga-scraper"
-REGION="${AWS_REGION:-us-east-1}"
+REGION="${AWS_REGION:-eu-west-3}"
 
 # Resource names
 S3_BUCKET="${PROJECT_NAME}-${ENVIRONMENT}-images"

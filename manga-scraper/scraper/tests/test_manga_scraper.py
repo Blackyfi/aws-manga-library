@@ -349,7 +349,7 @@ class TestLambdaHandler:
     @patch.dict('os.environ', {
         'S3_BUCKET': 'test-bucket',
         'DYNAMODB_TABLE': 'test-table',
-        'AWS_REGION': 'us-east-1'
+        'AWS_REGION': 'eu-west-3'
     })
     @patch('manga_scraper.MangaScraper')
     def test_lambda_handler_success(self, mock_scraper_class):

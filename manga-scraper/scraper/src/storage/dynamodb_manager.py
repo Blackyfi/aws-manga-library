@@ -35,7 +35,7 @@ class DynamoDBManager:
     - Pagination support
     """
 
-    def __init__(self, table_name: str, region: str = 'us-east-1'):
+    def __init__(self, table_name: str, region: str = 'eu-west-3'):
         """
         Initialize DynamoDB manager
 
