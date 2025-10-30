@@ -5,10 +5,16 @@ Lambda Handler
 AWS Lambda entry point for manga scraping operations.
 """
 
+from __future__ import annotations
 import os
 import json
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.config import ScraperConfig
+    from src.processors import ImageProcessor, DuplicateDetector
+    from src.storage import S3Storage, DynamoDBManager
 
 # Setup basic logging first
 logging.basicConfig(level=os.environ.get('LOG_LEVEL', 'INFO'))
