@@ -112,27 +112,62 @@ if [ ! -f "lambda/requirements.txt" ]; then
     exit 1
 fi
 
-pip install -r lambda/requirements.txt -t "${PACKAGE_DIR}" --quiet --upgrade
-success "Dependencies installed"
+# Check if Docker is available for Lambda-compatible builds
+if command -v docker &> /dev/null; then
+    info "Using Docker to build Lambda-compatible package..."
 
-# Copy source code
-echo "  Copying source code..."
-if [ -d "src" ]; then
-    cp -r src "${PACKAGE_DIR}/"
+    # Build Docker image using AWS Lambda base
+    docker build -t manga-scraper-lambda-build:latest -f Dockerfile.lambda . > /dev/null 2>&1
+
+    if [ $? -ne 0 ]; then
+        warning "Docker build failed, falling back to pip install with platform flags"
+        pip install -r lambda/requirements.txt -t "${PACKAGE_DIR}" --quiet --upgrade \
+          --platform manylinux2014_x86_64 \
+          --implementation cp \
+          --python-version 3.11 \
+          --only-binary=:all:
+    else
+        # Extract built package from Docker container
+        CONTAINER_ID=$(docker create manga-scraper-lambda-build:latest)
+        docker cp "${CONTAINER_ID}:/var/task/." "${PACKAGE_DIR}/"
+        docker rm "${CONTAINER_ID}" > /dev/null 2>&1
+        success "Dependencies installed (Docker)"
+
+        # Skip source code copy since Docker already includes it
+        SKIP_SRC_COPY=true
+    fi
 else
-    error "src directory not found"
-    rm -rf "${TEMP_DIR}"
-    exit 1
+    warning "Docker not available, using pip with Lambda-compatible flags"
+    pip install -r lambda/requirements.txt -t "${PACKAGE_DIR}" --quiet --upgrade \
+      --platform manylinux2014_x86_64 \
+      --implementation cp \
+      --python-version 3.11 \
+      --only-binary=:all:
+    success "Dependencies installed (pip with platform flags)"
 fi
 
-if [ -d "lambda" ]; then
-    cp lambda/*.py "${PACKAGE_DIR}/" 2>/dev/null || true
+# Copy source code (skip if Docker already copied it)
+if [ "${SKIP_SRC_COPY}" != "true" ]; then
+    echo "  Copying source code..."
+    if [ -d "src" ]; then
+        cp -r src "${PACKAGE_DIR}/"
+    else
+        error "src directory not found"
+        rm -rf "${TEMP_DIR}"
+        exit 1
+    fi
+
+    if [ -d "lambda" ]; then
+        cp lambda/*.py "${PACKAGE_DIR}/" 2>/dev/null || true
+    else
+        error "lambda directory not found"
+        rm -rf "${TEMP_DIR}"
+        exit 1
+    fi
+    success "Source code copied"
 else
-    error "lambda directory not found"
-    rm -rf "${TEMP_DIR}"
-    exit 1
+    info "Source code already included from Docker build"
 fi
-success "Source code copied"
 
 # Copy configuration files
 echo "  Copying configuration..."
