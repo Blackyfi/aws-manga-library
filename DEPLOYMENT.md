@@ -22,6 +22,17 @@ Welcome! This guide will walk you through deploying the Manga Scraper applicatio
 
 ---
 
+## SPECIAL
+
+```bash
+git fetch origin
+git reset --hard origin/main
+```
+
+```bash
+wsl -d Ubuntu
+```
+
 ## What You're Building
 
 You're deploying a **serverless manga scraper application** on AWS that can:
