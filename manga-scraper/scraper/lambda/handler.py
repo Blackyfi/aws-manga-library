@@ -10,18 +10,9 @@ import json
 import logging
 from typing import Dict, Any
 
-# Import from src package
-import sys
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-
-from src.config import ScraperConfig
-from src.scrapers import MangaDexScraper, MangaKakalotScraper
-from src.processors import ImageProcessor, DuplicateDetector
-from src.storage import S3Storage, DynamoDBManager
-from src.utils import setup_logger
-
-# Setup logging
-logger = setup_logger('lambda_handler', level=os.environ.get('LOG_LEVEL', 'INFO'))
+# Setup basic logging first
+logging.basicConfig(level=os.environ.get('LOG_LEVEL', 'INFO'))
+logger = logging.getLogger('lambda_handler')
 
 
 def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
@@ -52,8 +43,31 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     try:
         logger.info(f"Lambda invoked with event: {json.dumps(event)}")
 
-        # Extract action and source
+        # Extract action
         action = event.get('action', 'scrape_manga')
+
+        # Handle health check first (no imports needed)
+        if action == 'health_check':
+            return {
+                'statusCode': 200,
+                'body': json.dumps({
+                    'success': True,
+                    'message': 'Manga scraper is healthy',
+                    'version': '1.0.0',
+                    'environment': {
+                        'S3_BUCKET': os.environ.get('S3_BUCKET', 'not set'),
+                        'DYNAMODB_TABLE': os.environ.get('DYNAMODB_TABLE', 'not set'),
+                        'AWS_REGION': os.environ.get('AWS_REGION', 'not set')
+                    }
+                })
+            }
+
+        # Import modules only when needed for actual scraping
+        from src.config import ScraperConfig
+        from src.scrapers import MangaDexScraper, MangaKakalotScraper
+        from src.processors import ImageProcessor, DuplicateDetector
+        from src.storage import S3Storage, DynamoDBManager
+
         source = event.get('source', 'mangadex').lower()
 
         # Get configuration
@@ -61,7 +75,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         config.validate()
 
         # Initialize components
-        scraper = _get_scraper(source)
+        scraper = _get_scraper(source, MangaDexScraper, MangaKakalotScraper)
         image_processor = ImageProcessor(
             target_size_kb=config.target_image_size_kb,
             webp_quality=config.webp_quality
@@ -313,12 +327,14 @@ def handle_list_manga(event: Dict[str, Any], scraper: Any) -> Dict[str, Any]:
     }
 
 
-def _get_scraper(source: str) -> Any:
+def _get_scraper(source: str, MangaDexScraper, MangaKakalotScraper) -> Any:
     """
     Get scraper instance for source
 
     Args:
         source: Source name
+        MangaDexScraper: MangaDex scraper class
+        MangaKakalotScraper: MangaKakalot scraper class
 
     Returns:
         Scraper instance

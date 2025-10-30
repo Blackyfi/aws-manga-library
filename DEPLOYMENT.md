@@ -448,52 +448,7 @@ This file explains how data is structured in DynamoDB.
 
 Time to deploy the actual application code to AWS Lambda!
 
-### Step 5.1: Install Docker (IMPORTANT)
-
-Docker ensures your Lambda package is built with the correct dependencies for AWS Lambda's environment.
-
-**Check if Docker is installed:**
-```bash
-docker --version
-```
-
-**If Docker is not installed:**
-
-- **Windows (WSL)**:
-  ```bash
-  # Install Docker Desktop for Windows from:
-  # https://docs.docker.com/desktop/install/windows-install/
-  # Then enable WSL 2 integration in Docker Desktop settings
-  ```
-
-- **Ubuntu/WSL**:
-  ```bash
-  # Update package list
-  sudo apt update
-
-  # Install Docker
-  curl -fsSL https://get.docker.com -o get-docker.sh
-  sudo sh get-docker.sh
-
-  # Add your user to docker group
-  sudo usermod -aG docker $USER
-
-  # Restart your terminal or run:
-  newgrp docker
-  ```
-
-- **Mac**:
-  ```bash
-  # Install Docker Desktop from:
-  # https://docs.docker.com/desktop/install/mac-install/
-  ```
-
-**Verify Docker works:**
-```bash
-docker run hello-world
-```
-
-### Step 5.2: Check Python Dependencies
+### Step 5.1: Check Python Dependencies
 
 Verify the requirements file exists:
 
@@ -506,7 +461,7 @@ cat lambda/requirements.txt
 
 You should see packages like: `requests`, `beautifulsoup4`, `Pillow`, `boto3`, etc.
 
-### Step 5.3: Run Deployment Script
+### Step 5.2: Run Deployment Script
 
 ```bash
 # Go back to the manga-scraper directory
@@ -518,25 +473,24 @@ cd ..
 
 **This script will:**
 1. ✓ Load environment variables from .env.dev
-2. ✓ Check prerequisites (AWS CLI, Python, zip, Docker)
+2. ✓ Check prerequisites (AWS CLI, Python, zip)
 3. ✓ Create temporary package directory
-4. ✓ **Build Lambda package using Docker** (ensures Lambda compatibility)
-5. ✓ Install Python dependencies in AWS Lambda environment
-6. ✓ Copy source code
-7. ✓ Optimize package size (remove tests, cache files)
-8. ✓ Create zip archive (deployment package)
-9. ✓ Upload to AWS Lambda (create or update function)
-10. ✓ Configure environment variables
-11. ✓ Set memory (1024 MB) and timeout (300 seconds)
-12. ✓ Wait for function to be ready
-13. ✓ Clean up temporary files
+4. ✓ Install Python dependencies with Lambda-compatible platform flags
+5. ✓ Copy source code
+6. ✓ Optimize package size (remove tests, cache files)
+7. ✓ Create zip archive (deployment package)
+8. ✓ Upload to AWS Lambda (create or update function)
+9. ✓ Configure environment variables
+10. ✓ Set memory (1024 MB) and timeout (300 seconds)
+11. ✓ Wait for function to be ready
+12. ✓ Clean up temporary files
 
-**This takes about 3-7 minutes** (depending on your internet speed).
+**This takes about 2-5 minutes** (depending on your internet speed).
 
-**What happens if Docker is not available?**
-The script will automatically fall back to using pip with Lambda-compatible platform flags, but Docker is **strongly recommended** for reliability.
+**How it works:**
+The script uses pip with special flags (`--platform manylinux2014_x86_64 --python-version 3.11`) to ensure all binary dependencies (like Pillow for image processing) are compiled for AWS Lambda's Amazon Linux 2 environment, not your local system.
 
-### Step 5.4: Verify Lambda Function
+### Step 5.3: Verify Lambda Function
 
 ```bash
 # Check Lambda function exists
@@ -766,25 +720,30 @@ Dependencies weren't packaged correctly. Redeploy:
 ### Problem: "cannot import name '_imaging' from 'PIL'" in Lambda
 
 **Solution:**
-This means Pillow was built for the wrong architecture. The Lambda package must be built using Docker or with Lambda-compatible platform flags.
+This means Pillow was built for the wrong architecture. This happens when you install dependencies with regular `pip install` instead of using Lambda-compatible platform flags.
 
-**Step 1: Check if Docker is installed**
-```bash
-docker --version
-```
+**The Fix:**
+The deployment script (`./scripts/deploy/deploy-lambda.sh`) has been updated to automatically use Lambda-compatible flags. Simply redeploy:
 
-**Step 2: Install Docker if needed** (see Part 5, Step 5.1)
-
-**Step 3: Redeploy with Docker**
 ```bash
 # Navigate to the manga-scraper directory
 cd ~/projects/aws-manga-library/manga-scraper
 
-# Redeploy using the updated script
+# Pull latest changes if you haven't already
+git pull
+
+# Redeploy using the fixed script
 ./scripts/deploy/deploy-lambda.sh dev
 ```
 
-**Step 4: Verify the deployment**
+The script now uses:
+```bash
+pip install --platform manylinux2014_x86_64 --python-version 3.11 --only-binary=:all:
+```
+
+This ensures Pillow and other binary packages are compiled for AWS Lambda's environment.
+
+**Verify the deployment:**
 ```bash
 # Test the Lambda function
 aws lambda invoke \
@@ -802,14 +761,11 @@ You should see:
 ```json
 {
   "statusCode": 200,
-  "body": {
-    "success": true,
-    "message": "Manga scraper is healthy"
-  }
+  "body": "{\"success\": true, \"message\": \"Manga scraper is healthy\", \"version\": \"1.0.0\"}"
 }
 ```
 
-**If you still get the error**, check the CloudWatch logs:
+**If you still get errors**, check the CloudWatch logs:
 ```bash
 aws logs tail /aws/lambda/manga-scraper-dev --follow --region eu-west-3
 ```

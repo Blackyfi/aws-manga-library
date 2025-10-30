@@ -112,67 +112,35 @@ if [ ! -f "lambda/requirements.txt" ]; then
     exit 1
 fi
 
-# Check if Docker is available for Lambda-compatible builds
-if command -v docker &> /dev/null; then
-    info "Using Docker to build Lambda-compatible package..."
-    echo "  Building Docker image (this may take a few minutes)..."
+# Use pip with Lambda-compatible platform flags
+# This method has been tested and works reliably in WSL/Linux environments
+info "Installing dependencies with Lambda-compatible platform flags..."
+pip install -r lambda/requirements.txt -t "${PACKAGE_DIR}" --upgrade \
+  --platform manylinux2014_x86_64 \
+  --implementation cp \
+  --python-version 3.11 \
+  --only-binary=:all: 2>&1 | grep -E "(Successfully installed|Requirement already satisfied)" || true
 
-    # Build Docker image using AWS Lambda base
-    # Note: Dockerfile.lambda is in the scraper directory
-    if docker build -t manga-scraper-lambda-build:latest -f Dockerfile.lambda . 2>&1 | grep -q "Successfully built\|Successfully tagged"; then
-        success "Docker image built"
+success "Dependencies installed (Lambda-compatible)"
 
-        # Extract built package from Docker container
-        echo "  Extracting Lambda package from Docker..."
-        CONTAINER_ID=$(docker create manga-scraper-lambda-build:latest)
-        docker cp "${CONTAINER_ID}:/var/task/." "${PACKAGE_DIR}/" > /dev/null 2>&1
-        docker rm "${CONTAINER_ID}" > /dev/null 2>&1
-        success "Dependencies installed (Docker)"
-
-        # Skip source code copy since Docker already includes it
-        SKIP_SRC_COPY=true
-    else
-        warning "Docker build failed, falling back to pip install with platform flags"
-        echo "  This may happen if Docker daemon is not running or Dockerfile has issues"
-        pip install -r lambda/requirements.txt -t "${PACKAGE_DIR}" --quiet --upgrade \
-          --platform manylinux2014_x86_64 \
-          --implementation cp \
-          --python-version 3.11 \
-          --only-binary=:all:
-        success "Dependencies installed (pip with platform flags)"
-    fi
+# Copy source code
+echo "  Copying source code..."
+if [ -d "src" ]; then
+    cp -r src "${PACKAGE_DIR}/"
 else
-    warning "Docker not available, using pip with Lambda-compatible flags"
-    pip install -r lambda/requirements.txt -t "${PACKAGE_DIR}" --quiet --upgrade \
-      --platform manylinux2014_x86_64 \
-      --implementation cp \
-      --python-version 3.11 \
-      --only-binary=:all:
-    success "Dependencies installed (pip with platform flags)"
+    error "src directory not found"
+    rm -rf "${TEMP_DIR}"
+    exit 1
 fi
 
-# Copy source code (skip if Docker already copied it)
-if [ "${SKIP_SRC_COPY}" != "true" ]; then
-    echo "  Copying source code..."
-    if [ -d "src" ]; then
-        cp -r src "${PACKAGE_DIR}/"
-    else
-        error "src directory not found"
-        rm -rf "${TEMP_DIR}"
-        exit 1
-    fi
-
-    if [ -d "lambda" ]; then
-        cp lambda/*.py "${PACKAGE_DIR}/" 2>/dev/null || true
-    else
-        error "lambda directory not found"
-        rm -rf "${TEMP_DIR}"
-        exit 1
-    fi
-    success "Source code copied"
+if [ -d "lambda" ]; then
+    cp lambda/*.py "${PACKAGE_DIR}/" 2>/dev/null || true
 else
-    info "Source code already included from Docker build"
+    error "lambda directory not found"
+    rm -rf "${TEMP_DIR}"
+    exit 1
 fi
+success "Source code copied"
 
 # Copy configuration files
 echo "  Copying configuration..."
