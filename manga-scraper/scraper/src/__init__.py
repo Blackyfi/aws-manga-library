@@ -7,6 +7,6 @@ __version__ = "1.0.0"
 __author__ = "Your Name"
 
 from .manga_scraper import MangaScraper
-from .config import Config
+from .config import ScraperConfig
 
-__all__ = ["MangaScraper", "Config"]
+__all__ = ["MangaScraper", "ScraperConfig"]
