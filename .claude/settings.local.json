@@ -3,7 +3,11 @@
     "allow": [
       "Bash(dir /s /b \"c:\\Users\\Nicolas\\Documents\\git\\aws-manga-library\\manga-scraper\\scraper\\scripts\")",
       "Bash(dir /s /b \"c:\\Users\\Nicolas\\Documents\\git\\aws-manga-library\\manga-scraper\")",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(aws s3 ls:*)",
+      "Bash(aws lambda list-functions:*)",
+      "Bash(aws cloudfront list-distributions:*)",
+      "Bash(aws configure:*)"
     ],
     "deny": [],
     "ask": []
