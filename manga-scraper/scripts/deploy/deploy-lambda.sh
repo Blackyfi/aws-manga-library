@@ -115,26 +115,31 @@ fi
 # Check if Docker is available for Lambda-compatible builds
 if command -v docker &> /dev/null; then
     info "Using Docker to build Lambda-compatible package..."
+    echo "  Building Docker image (this may take a few minutes)..."
 
     # Build Docker image using AWS Lambda base
-    docker build -t manga-scraper-lambda-build:latest -f Dockerfile.lambda . > /dev/null 2>&1
+    # Note: Dockerfile.lambda is in the scraper directory
+    if docker build -t manga-scraper-lambda-build:latest -f Dockerfile.lambda . 2>&1 | grep -q "Successfully built\|Successfully tagged"; then
+        success "Docker image built"
 
-    if [ $? -ne 0 ]; then
-        warning "Docker build failed, falling back to pip install with platform flags"
-        pip install -r lambda/requirements.txt -t "${PACKAGE_DIR}" --quiet --upgrade \
-          --platform manylinux2014_x86_64 \
-          --implementation cp \
-          --python-version 3.11 \
-          --only-binary=:all:
-    else
         # Extract built package from Docker container
+        echo "  Extracting Lambda package from Docker..."
         CONTAINER_ID=$(docker create manga-scraper-lambda-build:latest)
-        docker cp "${CONTAINER_ID}:/var/task/." "${PACKAGE_DIR}/"
+        docker cp "${CONTAINER_ID}:/var/task/." "${PACKAGE_DIR}/" > /dev/null 2>&1
         docker rm "${CONTAINER_ID}" > /dev/null 2>&1
         success "Dependencies installed (Docker)"
 
         # Skip source code copy since Docker already includes it
         SKIP_SRC_COPY=true
+    else
+        warning "Docker build failed, falling back to pip install with platform flags"
+        echo "  This may happen if Docker daemon is not running or Dockerfile has issues"
+        pip install -r lambda/requirements.txt -t "${PACKAGE_DIR}" --quiet --upgrade \
+          --platform manylinux2014_x86_64 \
+          --implementation cp \
+          --python-version 3.11 \
+          --only-binary=:all:
+        success "Dependencies installed (pip with platform flags)"
     fi
 else
     warning "Docker not available, using pip with Lambda-compatible flags"
